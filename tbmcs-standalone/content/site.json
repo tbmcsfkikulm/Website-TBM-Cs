@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "settings": {
+    "title": "TBM-Cs FKIK ULM",
+    "description": "Tim Bantuan Medis Calamus scriptorius FKIK Universitas Lambung Mangkurat. Bersama mengabdi, bergerak untuk kemanusiaan.",
+    "hero_title": "Bersama Mengabdi. Bergerak untuk Kemanusiaan.",
+    "hero_intro": "Tim Bantuan Medis Calamus scriptorius FKIK ULM — ruang belajar, pengabdian, dan aksi kemanusiaan sejak 15 Oktober 1995.",
+    "rental_phone": "6282275457472",
+    "rental_contact": "Siti Melati"
+  },
+  "pages": [
+    {
+      "slug": "about",
+      "title": "Tentang TBM-Cs",
+      "status": "published",
+      "body": "Tim Bantuan Medis Calamus scriptorius merupakan organisasi di FKIK Universitas Lambung Mangkurat, Banjarmasin.\n\nBerdiri sejak 15 Oktober 1995, TBM-Cs menjadi ruang belajar, pengabdian, dan aksi kemanusiaan bagi anggotanya."
+    },
+    {
+      "slug": "struktur-kepengurusan",
+      "title": "Struktur Kepengurusan",
+      "status": "published",
+      "body": ""
+    },
+    {
+      "slug": "kegiatan-2026",
+      "title": "Kegiatan 2026",
+      "status": "published",
+      "body": ""
+    },
+    {
+      "slug": "artikel-penelitian",
+      "title": "Artikel & Penelitian",
+      "status": "published",
+      "body": ""
+    },
+    {
+      "slug": "buku-profil",
+      "title": "Buku Profil",
+      "status": "published",
+      "body": ""
+    },
+    {
+      "slug": "buku-pedoman",
+      "title": "Buku Pedoman",
+      "status": "published",
+      "body": ""
+    }
+  ],
+  "posts": [],
+  "rentals": [
+    {
+      "name": "Bidai tangan",
+      "price": 10000,
+      "unit": "pasang",
+      "category": "Evakuasi & Penunjang",
+      "available": true
+    },
+    {
+      "name": "Mitela",
+      "price": 10000,
+      "unit": "3 pcs",
+      "category": "Evakuasi & Penunjang",
+      "available": true
+    },
+    {
+      "name": "Ice bag",
+      "price": 10000,
+      "unit": "pcs",
+      "category": "Evakuasi & Penunjang",
+      "available": true
+    },
+    {
+      "name": "Tandu",
+      "price": 40000,
+      "unit": "pcs",
+      "category": "Evakuasi & Penunjang",
+      "available": true
+    },
+    {
+      "name": "Tensimeter & stetoskop",
+      "price": 40000,
+      "unit": "set",
+      "category": "Pemeriksaan",
+      "available": true
+    },
+    {
+      "name": "GCU",
+      "price": 40000,
+      "unit": "pcs",
+      "category": "Pemeriksaan",
+      "available": true
+    },
+    {
+      "name": "Minor set",
+      "price": 30000,
+      "unit": "set",
+      "category": "Tindakan & Prosedur",
+      "available": true
+    },
+    {
+      "name": "Iodine cup",
+      "price": 4000,
+      "unit": "pcs",
+      "category": "Tindakan & Prosedur",
+      "available": true
+    },
+    {
+      "name": "Bengkok",
+      "price": 8000,
+      "unit": "pcs",
+      "category": "Tindakan & Prosedur",
+      "available": true
+    },
+    {
+      "name": "Tourniquet",
+      "price": 4000,
+      "unit": "pcs",
+      "category": "Tindakan & Prosedur",
+      "available": true
+    },
+    {
+      "name": "Timbangan",
+      "price": 30000,
+      "unit": "pcs",
+      "category": "Pemeriksaan",
+      "available": true
+    },
+    {
+      "name": "Penlight",
+      "price": 5000,
+      "unit": "pcs",
+      "category": "Pemeriksaan",
+      "available": true
+    },
+    {
+      "name": "Mikrotoa",
+      "price": 15000,
+      "unit": "pcs",
+      "category": "Pemeriksaan",
+      "available": true
+    }
+  ]
+}

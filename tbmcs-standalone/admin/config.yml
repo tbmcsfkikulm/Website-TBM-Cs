@@ -1,0 +1,65 @@
+backend:
+  name: github
+  repo: GANTI_ORGANISASI/GANTI_REPOSITORY
+  branch: main
+  base_url: https://GANTI_OAUTH.example
+  auth_endpoint: auth
+media_folder: public/uploads
+public_folder: /uploads
+locale: id
+# Status draft/published disimpan di setiap item JSON. Build menyaring draft.
+# Publikasi CMS melakukan commit ke branch di atas; Pages membangun ulang.
+collections:
+  - name: website
+    label: Konten website
+    files:
+      - name: site
+        label: Website TBM-Cs
+        file: content/site.json
+        format: json
+        fields:
+          - {label: Versi skema, name: version, widget: hidden, default: 1}
+          - label: Pengaturan
+            name: settings
+            widget: object
+            fields:
+              - {label: Nama website, name: title, widget: string}
+              - {label: Deskripsi, name: description, widget: text}
+              - {label: Judul beranda, name: hero_title, widget: string}
+              - {label: Pengantar beranda, name: hero_intro, widget: text}
+              - {label: WhatsApp logistik, name: rental_phone, widget: string, pattern: ['^[1-9][0-9]{7,14}$', 'Format internasional tanpa tanda +']}
+              - {label: Nama kontak logistik, name: rental_contact, widget: string}
+          - label: Artikel
+            name: posts
+            widget: list
+            required: false
+            summary: '{{fields.title}} · {{fields.status}}'
+            fields:
+              - {label: Judul, name: title, widget: string}
+              - {label: Slug unik, name: slug, widget: string, pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', 'Huruf kecil, angka, dan tanda -']}
+              - {label: Status, name: status, widget: select, options: [draft, published], default: draft}
+              - {label: Tanggal, name: date, widget: datetime, format: 'YYYY-MM-DD', date_format: 'DD MMM YYYY', time_format: false}
+              - {label: Kategori, name: category, widget: string}
+              - {label: Ringkasan, name: excerpt, widget: text, required: false}
+              - {label: Cover, name: cover, widget: image, required: false, allow_multiple: false}
+              - {label: Deskripsi gambar, name: cover_alt, widget: string, required: false}
+              - {label: Isi, name: body, widget: text, hint: 'Pisahkan paragraf dengan baris kosong; awali subjudul dengan ##. HTML tidak dieksekusi.'}
+          - label: Halaman
+            name: pages
+            widget: list
+            summary: '{{fields.title}}'
+            fields:
+              - {label: Judul, name: title, widget: string}
+              - {label: Slug unik, name: slug, widget: string, pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', 'Huruf kecil, angka, dan tanda -']}
+              - {label: Status, name: status, widget: select, options: [draft, published], default: draft}
+              - {label: Isi, name: body, widget: text, required: false}
+          - label: Katalog sewa
+            name: rentals
+            widget: list
+            summary: '{{fields.name}}'
+            fields:
+              - {label: Nama alat, name: name, widget: string}
+              - {label: Kategori, name: category, widget: string}
+              - {label: Tarif Rupiah, name: price, widget: number, value_type: int, min: 0}
+              - {label: Satuan, name: unit, widget: string}
+              - {label: Tersedia, name: available, widget: boolean, default: true}
