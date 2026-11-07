@@ -1,10 +1,10 @@
 backend:
   name: github
-  repo: GANTI_ORGANISASI/GANTI_REPOSITORY
+  repo: tbmcsfkikulm/Website-TBM-Cs
   branch: main
-  base_url: https://GANTI_OAUTH.example
+  base_url: https://tbmcs-cms-auth.tbmcs95.workers.dev
   auth_endpoint: auth
-media_folder: public/uploads
+media_folder: tbmcs-standalone/public/uploads
 public_folder: /uploads
 locale: id
 # Status draft/published disimpan di setiap item JSON. Build menyaring draft.
@@ -15,7 +15,7 @@ collections:
     files:
       - name: site
         label: Website TBM-Cs
-        file: content/site.json
+        file: tbmcs-standalone/content/site.json
         format: json
         fields:
           - {label: Versi skema, name: version, widget: hidden, default: 1}
