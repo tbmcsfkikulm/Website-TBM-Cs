@@ -2,7 +2,7 @@ backend:
   name: github
   repo: tbmcsfkikulm/Website-TBM-Cs
   branch: main
-  base_url: https://tbmcs-cms-auth.tbmcs95.workers.dev
+  base_url: https://auth.tbmcs.web.id
   auth_endpoint: auth
 media_folder: tbmcs-standalone/public/uploads
 public_folder: /uploads
