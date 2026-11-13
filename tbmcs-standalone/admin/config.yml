@@ -43,7 +43,8 @@ collections:
               - {label: Ringkasan, name: excerpt, widget: text, required: false}
               - {label: Cover, name: cover, widget: image, required: false, allow_multiple: false}
               - {label: Deskripsi gambar, name: cover_alt, widget: string, required: false}
-              - {label: Isi, name: body, widget: text, hint: 'Pisahkan paragraf dengan baris kosong; awali subjudul dengan ##. HTML tidak dieksekusi.'}
+              - {label: Isi, name: body, widget: text, hint: 'Pisahkan paragraf dengan baris kosong; awali subjudul dengan ##. Untuk format kaya dan foto dalam tulisan, gunakan Ruang Kelola. Mengedit isi teks di sini mengembalikan tampilan ke teks sederhana.'}
+              - {label: HTML artikel (dikelola Ruang Kelola), name: body_html, widget: text, required: false, hint: 'Gunakan editor /ruang-kelola/ untuk menyunting HTML beserta teks pendampingnya. Kosongkan untuk menggunakan isi teks sederhana.'}
           - label: Halaman
             name: pages
             widget: list
@@ -53,6 +54,7 @@ collections:
               - {label: Slug unik, name: slug, widget: string, pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', 'Huruf kecil, angka, dan tanda -']}
               - {label: Status, name: status, widget: select, options: [draft, published], default: draft}
               - {label: Isi, name: body, widget: text, required: false}
+              - {label: HTML artikel (dikelola Ruang Kelola), name: body_html, widget: text, required: false, hint: 'Gunakan editor /ruang-kelola/ untuk menyunting HTML beserta teks pendampingnya. Kosongkan untuk menggunakan isi teks sederhana.'}
           - label: Katalog sewa
             name: rentals
             widget: list

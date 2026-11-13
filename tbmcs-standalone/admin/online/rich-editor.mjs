@@ -1,0 +1,37 @@
+import './rich-content.js';
+export function mountEditor(textarea,item,onChange,compress){
+ const C=globalThis.TBMContent,wrap=document.createElement('section');wrap.className='rich-editor wide';
+ textarea.parentElement.hidden=true;
+ wrap.innerHTML='<div class="rich-toolbar" role="group" aria-label="Format artikel"><button type="button" data-mode="simple">Mode sederhana</button><button type="button" data-mode="html">Mode HTML</button><label class="button">Impor HTML<input class="file" type="file" accept=".html,.htm,text/html" data-import></label></div><div class="rich-tools"><button type="button" data-cmd="bold"><b>Bold</b></button><button type="button" data-cmd="italic"><i>Italic</i></button><button type="button" data-cmd="underline"><u>Garis bawah</u></button><button type="button" data-cmd="insertUnorderedList">Daftar</button><button type="button" data-cmd="undo">Undo</button><button type="button" data-cmd="redo">Redo</button><label>Format<select data-block><option value="p">Paragraf</option><option value="h2">Judul bagian</option><option value="h3">Subjudul</option><option value="blockquote">Kutipan</option></select></label><label>Font<select data-font><option value="Arial">Sans serif</option><option value="Georgia">Editorial serif</option><option value="Courier New">Monospace</option></select></label><button type="button" data-link>Tautan</button><button type="button" data-photo>Foto / grid foto</button></div><div class="rich-surface detail-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Isi artikel"></div><label class="html-label" hidden>Kode HTML<textarea class="html-source" spellcheck="false" aria-label="Kode HTML artikel"></textarea></label><div class="photo-controls" hidden><label>Foto<input type="file" data-photos accept="image/png,image/jpeg,image/webp" multiple></label><label>Susunan<select data-layout><option value="single">Foto satu per baris</option><option value="grid-2">Grid 2 kolom</option><option value="grid-3">Grid 3 kolom</option></select></label><label>Deskripsi foto<input data-alt placeholder="Jelaskan isi foto untuk pembaca"></label><label>Caption<input data-caption></label><button type="button" data-insert>Masukkan foto</button></div><p class="rich-note" role="status">Pilih teks untuk memformatnya. Letakkan kursor di posisi foto. HTML impor memakai format artikel website ini.</p>';
+ textarea.parentElement.after(wrap);
+ const surface=wrap.querySelector('.rich-surface'),source=wrap.querySelector('.html-source'),note=wrap.querySelector('.rich-note'),tools=wrap.querySelector('.rich-tools');
+ surface.innerHTML=C.content(item);let mode='simple',range=null,working=false;
+ function setWorking(value){working=value;wrap.setAttribute('aria-busy',String(value));wrap.querySelectorAll('button,input,select,textarea').forEach(e=>e.disabled=value);surface.contentEditable=String(!value);}
+ function remember(){const s=getSelection();if(s.rangeCount&&surface.contains(s.anchorNode)&&surface.contains(s.focusNode))range=s.getRangeAt(0).cloneRange();}
+ function restore(){surface.focus();const s=getSelection();s.removeAllRanges();if(range&&surface.contains(range.commonAncestorContainer))s.addRange(range);else{const r=document.createRange();r.selectNodeContents(surface);r.collapse(false);s.addRange(r);}}
+ function command(cmd,value=null){restore();if(!document.execCommand(cmd,false,value))note.textContent='Perintah belum didukung browser ini; gunakan mode HTML.';remember();onChange();}
+ surface.addEventListener('keyup',remember);surface.addEventListener('mouseup',remember);surface.addEventListener('input',()=>{remember();onChange();});
+ surface.addEventListener('paste',e=>{e.preventDefault();const html=e.clipboardData.getData('text/html');command('insertHTML',html?C.sanitize(html):C.fromText(e.clipboardData.getData('text/plain')));});
+ surface.addEventListener('drop',e=>e.preventDefault());
+ tools.addEventListener('mousedown',e=>{if(e.target.closest('button'))e.preventDefault();});
+ wrap.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>command(b.dataset.cmd));
+ wrap.querySelector('[data-block]').onchange=e=>command('formatBlock',e.target.value);
+ wrap.querySelector('[data-font]').onchange=e=>command('fontName',e.target.value);
+ wrap.querySelector('[data-link]').onclick=()=>{const href=prompt('Alamat tautan (https://… atau mailto:…)');if(!href)return;if(!C.link(href)){note.textContent='Alamat tautan tidak didukung.';return;}command('createLink',href);};
+ const html=()=>C.sanitize(mode==='html'?source.value:surface.innerHTML);
+ function switchMode(next){if(working)return;const clean=html();source.value=clean;surface.innerHTML=clean;mode=next;range=null;surface.hidden=next==='html';tools.hidden=next==='html';wrap.querySelector('.html-label').hidden=next!=='html';wrap.querySelector('.photo-controls').hidden=true;wrap.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===next)));}
+ wrap.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));source.oninput=onChange;
+ wrap.querySelector('[data-import]').onchange=async e=>{const f=e.target.files[0];if(!f||working)return;try{if(f.size>900*1024)throw Error('HTML maksimal 900 KB.');if(!confirm('Ganti isi artikel dengan HTML ini? Judul, slug, dan status tetap.'))return;setWorking(true);const t=document.createElement('template');t.innerHTML=await f.text();const article=t.content.querySelector('article')||t.content.querySelector('main');const clean=C.sanitize(article?article.innerHTML:t.innerHTML);source.value=clean;surface.innerHTML=clean;range=null;onChange();note.textContent='HTML diimpor. Periksa foto: gambar dari folder lokal perlu diunggah ulang. Script, embed, dan CSS bebas tidak disertakan.';}catch(err){note.textContent=err.message;}finally{e.target.value='';setWorking(false);}};
+ wrap.querySelector('[data-photo]').onclick=()=>{remember();wrap.querySelector('.photo-controls').hidden=false;};
+ wrap.querySelector('[data-insert]').onclick=async()=>{
+  if(working)return;const files=[...wrap.querySelector('[data-photos]').files];if(!files.length){note.textContent='Pilih foto dahulu.';return;}if(files.length>6){note.textContent='Maksimal 6 foto per penyisipan.';return;}
+  setWorking(true);note.textContent='Memperkecil gambar…';
+  try{const box=document.createElement('div');const layout=wrap.querySelector('[data-layout]').value;if(layout!=='single')box.className='photo-grid '+layout;
+   for(const file of files){const figure=document.createElement('figure'),img=document.createElement('img');img.src=await compress(file);img.alt=wrap.querySelector('[data-alt]').value||file.name;figure.append(img);const caption=wrap.querySelector('[data-caption]').value;if(caption){const c=document.createElement('figcaption');c.textContent=caption;figure.append(c);}box.append(figure);}
+   command('insertHTML',C.sanitize(box.outerHTML)+'<p><br></p>');wrap.querySelector('.photo-controls').hidden=true;note.textContent='Foto dimasukkan. Klik caption untuk mengubahnya.';
+  }catch(e){note.textContent=e.message;}finally{setWorking(false);}
+ };
+ switchMode('simple');
+ if(item.body_html&&C.sanitize(item.body_html)!==surface.innerHTML)note.textContent='Isi teks telah berubah melalui editor lain. Teks terbaru digunakan; periksa dan atur ulang format sebelum menyimpan.';
+ return {get busy(){return working;},read(){if(working)throw Error('Tunggu pemrosesan gambar selesai.');const body_html=html();return {body_html,body:C.plain(body_html)};}};
+}

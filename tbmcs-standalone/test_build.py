@@ -27,6 +27,22 @@ class BuildTests(unittest.TestCase):
   for text in ['<b:','<data:','expr:','blogspot.com','blogger.com','/feeds/posts','googleapis.com','googlesyndication.com']:
    self.assertNotIn(text,out)
   self.assertNotRegex(out,r'<script[^>]+src=')
+ def test_rich_content_compatibility(self):
+  item={'slug':'uji-rich','title':'Uji','status':'published','body':'Isi','body_html':'<p>Isi <img src="/uploads/foto.webp" onerror="alert(1)"></p>'}
+  self.data['posts']=[item]
+  self.assertEqual(build.validate(self.data)['posts'][0]['body_html'],item['body_html'])
+  out=build.render(self.data)
+  self.assertNotIn('<img src="/uploads/foto.webp" onerror=',out)
+  payload=re.search(r'<script id="site-data" type="application/json">(.*?)</script>',out,re.S).group(1)
+  self.assertEqual(json.loads(payload)['posts'][0]['body_html'],item['body_html'])
+  item['status']='draft';self.assertNotIn('foto.webp',build.render(self.data))
+  item['body_html']={}
+  with self.assertRaises(ValueError):build.validate(self.data)
+ def test_favicon_files(self):
+  out=build.render(self.data)
+  self.assertIn('href="/favicon.ico"',out)
+  self.assertEqual((build.ROOT/'public/favicon.ico').read_bytes()[:4],bytes([0,0,1,0]))
+  self.assertEqual((build.ROOT/'public/favicon.png').read_bytes()[:8],b'\x89PNG\r\n\x1a\n')
  def test_internal_routes(self):
   out=(build.ROOT/'src/shell.html').read_text();slugs={x['slug'] for x in self.data['pages']}
   for slug in re.findall('href="#page/([^"#]+)',out):self.assertIn(slug,slugs)
