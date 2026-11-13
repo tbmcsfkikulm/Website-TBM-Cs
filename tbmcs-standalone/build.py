@@ -20,6 +20,7 @@ def validate(d):
    if item.get('status') not in ('draft','published'):raise ValueError('Status harus draft/published.')
    if not item.get('title','').strip():raise ValueError('Judul wajib diisi.')
    if not isinstance(item.get('body',''),str):raise ValueError('Isi harus teks.')
+   if 'body_html' in item and not isinstance(item['body_html'],str):raise ValueError('HTML artikel harus teks.')
    cover=item.get('cover','')
    if cover and not re.match(r'^(https://|/uploads/|data:image/(png|jpeg|webp|gif);base64,)',cover):raise ValueError('URL cover tidak didukung.')
  if not isinstance(d.get('rentals'),list):raise ValueError('rentals harus daftar.')
@@ -50,7 +51,7 @@ def template():
  # The selected functions use the configured rental contact, without hardcoding credentials.
  interactions=interactions.replace("'https://wa.me/6282275457472?text='","'https://wa.me/'+JSON.parse(document.getElementById('site-data').textContent).settings.rental_phone+'?text='")
  interactions=interactions.replace("'Halo Kak Siti Melati, saya ingin mengajukan", "'Halo '+JSON.parse(document.getElementById('site-data').textContent).settings.rental_contact+', saya ingin mengajukan")
- return '<!DOCTYPE html>\n<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#062f1b"><meta name="color-scheme" content="light dark"><title>@@TITLE@@</title><meta name="description" content="@@DESCRIPTION@@"><script>try{document.documentElement.dataset.theme=localStorage.getItem("tbmcs-theme")||"light"}catch(e){}</script><style>'+css+'</style></head><body class="home-view"><noscript><p class="noscript-note">Aktifkan JavaScript untuk navigasi halaman, pencarian, dan formulir. Kontak organisasi tetap tersedia pada beranda.</p></noscript>'+(src/'shell.html').read_text()+'<script id="site-data" type="application/json">@@DATA@@</script><script>'+(src/'app.js').read_text()+'</script><script>'+interactions+'</script><script>'+(src/'logo.js').read_text()+'</script></body></html>'
+ return '<!DOCTYPE html>\n<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#062f1b"><meta name="color-scheme" content="light dark"><title>@@TITLE@@</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="64x64" href="/favicon.png"><meta name="description" content="@@DESCRIPTION@@"><script>try{document.documentElement.dataset.theme=localStorage.getItem("tbmcs-theme")||"light"}catch(e){}</script><style>'+css+'</style></head><body class="home-view"><noscript><p class="noscript-note">Aktifkan JavaScript untuk navigasi halaman, pencarian, dan formulir. Kontak organisasi tetap tersedia pada beranda.</p></noscript>'+(src/'shell.html').read_text()+'<script id="site-data" type="application/json">@@DATA@@</script><script>'+(src/'rich-content.js').read_text()+';\n'+(src/'app.js').read_text()+'</script><script>'+interactions+'</script><script>'+(src/'logo.js').read_text()+'</script></body></html>'
 def render(d):return template().replace('@@TITLE@@',html.escape(d['settings']['title'])).replace('@@DESCRIPTION@@',html.escape(d['settings']['description'],quote=True)).replace('@@DATA@@',serial(public_data(d)))
 def main():
  d=validate(json.loads((ROOT/'content/site.json').read_text()));dist=ROOT/'dist';dist.mkdir(exist_ok=True)
@@ -59,7 +60,12 @@ def main():
  (dist/'admin.html').write_text(admin);(dist/'admin').mkdir(exist_ok=True)
  for name in ('index.html','config.yml'):
   if (ROOT/'admin'/name).exists():shutil.copy2(ROOT/'admin'/name,dist/'admin'/name)
- (dist/'_headers').write_text('/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: SAMEORIGIN\n/admin*\n  X-Robots-Tag: noindex, nofollow\n')
+ # Additive dashboard: keep Decap at /admin/ and local editor at /admin.html.
+ shutil.copytree(ROOT/'admin/online',dist/'ruang-kelola',dirs_exist_ok=True)
+ shutil.copy2(ROOT/'src/rich-content.js',dist/'ruang-kelola/rich-content.js')
+ for name in ('favicon.png','favicon.ico'):shutil.copy2(ROOT/'public'/name,dist/name)
+ if (ROOT/'public/uploads').exists():shutil.copytree(ROOT/'public/uploads',dist/'uploads',dirs_exist_ok=True)
+ (dist/'_headers').write_text('/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  X-Frame-Options: SAMEORIGIN\n/admin*\n  X-Robots-Tag: noindex, nofollow\n/ruang-kelola/*\n  X-Robots-Tag: noindex, nofollow\n')
  # Fallback supports old /p/ links; content itself uses portable hash URLs.
  (dist/'404.html').write_text(render(d))
  print('Build OK:',len(d['posts']),'artikel sumber;',len(public_data(d)['posts']),'publik;',len(d['rentals']),'alat. Output: dist/')
